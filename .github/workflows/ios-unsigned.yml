@@ -1,6 +1,8 @@
 name: Build Unsigned iOS IPA
 
-# 鍦ㄤ簯绔?macOS锛圙itHub Actions 鎻愪緵鐨?Mac锛変笂鏋勫缓涓€涓€愭湭绛惧悕銆戠殑 Readest.ipa銆?# 鏃犻渶浠讳綍 Apple 璇佷功锛涗骇鐗╀笅杞藉悗鐢ㄢ€滆交鏉剧 / 鏄撶鈥濈瓑宸ュ叿鑷绛惧悕瀹夎銆?
+# 在云端 macOS（GitHub Actions 提供的 Mac）上构建一个【未签名】的 Readest.ipa。
+# 无需任何 Apple 证书；产物下载后用“轻松签 / 易签”等工具自行签名安装。
+
 on:
   workflow_dispatch:
   push:
@@ -22,7 +24,7 @@ jobs:
       - name: Checkout (with submodules)
         uses: actions/checkout@v4
         with:
-          # 浠撳簱鍖呭惈 8 涓?git 瀛愭ā鍧楋紙foliate-js銆乼auri銆乸lugins 绛夛級锛屾瀯寤哄繀闇€
+          # 仓库包含 8 个 git 子模块（foliate-js、tauri、plugins 等），构建必需
           submodules: recursive
           fetch-depth: 1
 
@@ -62,7 +64,7 @@ jobs:
         working-directory: apps/readest-app/src-tauri/gen/apple
         run: |
           set -euo pipefail
-          xcodebuild -project Readest.xcodeproj -target Readest_iOS -configuration Release -sdk iphoneos CONFIGURATION_BUILD_DIR="$PWD/build-out" DEVELOPMENT_TEAM="" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
+          xcodebuild -project Readest.xcodeproj -target Readest_iOS -configuration release -sdk iphoneos CONFIGURATION_BUILD_DIR="$PWD/build-out" DEVELOPMENT_TEAM="" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
 
       - name: Package unsigned IPA (Payload layout)
         working-directory: apps/readest-app/src-tauri/gen/apple
