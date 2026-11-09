@@ -62,17 +62,7 @@ jobs:
         working-directory: apps/readest-app/src-tauri/gen/apple
         run: |
           set -euo pipefail
-          # Xcode 26 瑕佹眰 -derivedDataPath 蹇呴』鎼厤 -scheme锛涜繖閲屾敼鐢?-target锛?          # 骞堕€氳繃 CONFIGURATION_BUILD_DIR 鐩存帴鎸囧畾浜х墿鐩綍锛岀粫寮€璇ラ檺鍒朵笖璺緞鍙帶銆?          xcodebuild \
-            -project Readest.xcodeproj \
-            -target Readest_iOS \
-            -configuration Release \
-            -sdk iphoneos \
-            CONFIGURATION_BUILD_DIR="$PWD/build-out" \
-            DEVELOPMENT_TEAM="" \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            build
+          xcodebuild -project Readest.xcodeproj -target Readest_iOS -configuration Release -sdk iphoneos CONFIGURATION_BUILD_DIR="$PWD/build-out" DEVELOPMENT_TEAM="" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
 
       - name: Package unsigned IPA (Payload layout)
         working-directory: apps/readest-app/src-tauri/gen/apple
