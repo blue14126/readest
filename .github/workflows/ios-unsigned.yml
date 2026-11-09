@@ -56,32 +56,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build frontend (Next.js static export -> out/)
+      # 用官方 Tauri CLI 驱动整个流程：它会自动构建前端(Next.js)、启动本地 build server、
+      # archive（跳过 codesign），并把未签名的 .app 直接打包成 Payload 结构的 ipa。
+      - name: Build unsigned iOS IPA (tauri ios build --no-sign)
         working-directory: apps/readest-app
-        run: pnpm build
+        run: pnpm tauri ios build --no-sign
 
-      - name: Build unsigned .app
-        working-directory: apps/readest-app/src-tauri/gen/apple
-        run: |
-          set -euo pipefail
-          xcodebuild -project Readest.xcodeproj -target Readest_iOS -configuration release -sdk iphoneos CONFIGURATION_BUILD_DIR="$PWD/build-out" DEVELOPMENT_TEAM="" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
-
-      - name: Package unsigned IPA (Payload layout)
-        working-directory: apps/readest-app/src-tauri/gen/apple
-        run: |
-          set -euo pipefail
-          APP_PATH="$PWD/build-out/Readest.app"
-          test -d "$APP_PATH"
-          echo "Built app: $APP_PATH"
-          rm -rf Payload Readest-unsigned.ipa
-          mkdir Payload
-          cp -R "$APP_PATH" Payload/
-          zip -qr Readest-unsigned.ipa Payload
-          ls -lh Readest-unsigned.ipa
+      - name: Show build output
+        run: ls -lh apps/readest-app/src-tauri/gen/apple/build/arm64/
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
           name: Readest-unsigned-ipa
-          path: apps/readest-app/src-tauri/gen/apple/Readest-unsigned.ipa
+          path: apps/readest-app/src-tauri/gen/apple/build/arm64/Readest.ipa
           retention-days: 30
